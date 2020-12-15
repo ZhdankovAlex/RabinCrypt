@@ -81,14 +81,9 @@ def Decrypt(data, p, q, n):
     # символ Лежандра 
     # (считаем квадратный корень из data)
     data_p = Power(data, (p + 1) / 4) % p
-    print('Mp = ' + str(data_p))
     data_q = Power(data, (q + 1) / 4) % q
-    print('Mq = ' + str(data_q))
        
     div, x, y = GCD(p, q)
-    result = x*p + y*q
-    print(str(x) + '*' + str(p) + ' + ' + 
-          str(y) + '*' + str(q) + ' = ' + str(result))
     print()
     # китайская теорема об остатках
     r1 = AdditingByMod(
@@ -105,19 +100,11 @@ def Decrypt(data, p, q, n):
 
 if __name__ == "__main__":
 
-    print('input your data: ')    
-    data = int(input())
-    print()
+    f = open('input.txt', 'r')
+    data = int(f.read())
 
-    primes = FindPrimes(0, 1000)
-    print('all primes: ')
-    print(primes)
-    print()
-    
+    primes = FindPrimes(0, 1000)    
     primesMod = FindModPrimes(primes)
-    print('primes which mod 4 = 3: ')
-    print(primesMod)
-    print()
     
     p = ChoiceRandomPrime(primesMod)
     q = ChoiceRandomPrime(primesMod)
@@ -125,21 +112,23 @@ if __name__ == "__main__":
     # если совпали значения, то выбираем, пока не станут различными
     while p == q or p * q <= data:
         q = ChoiceRandomPrime(primesMod)
+
+    f = open('output.txt', 'w')
     # (p,q) - закрытый ключ системы
-    print('Закрытый ключ: ' + str(p) + '; ' + str(q))
+    f.write('Закрытый ключ: ' + str(p) + '; ' + str(q) + '\n')
     n = p * q
     # n - открытый ключ системы
-    print('Открытый ключ: ' + str(n))
+    f.write('Открытый ключ: ' + str(n) + '\n')
     print()
 
     encrypt_data = Encrypt(data, n) 
-    print('!!! your encrypt data !!!: ' + str(encrypt_data))
+    f.write('Зашифрованные данные: ' + str(encrypt_data) + '\n')
     print()
 
     decrypt_data1, decrypt_data2, decrypt_data3, decrypt_data4 = Decrypt(encrypt_data, p, q, n)
-    print('!!! your decrypt data !!!: ' + 
-          str(decrypt_data1) + ' or ' +
-          str(decrypt_data2) + ' or ' +
-          str(decrypt_data3) + ' or ' +
-          str(decrypt_data4))
+    f.write('Расшифрованные данные: ' + 
+          str(decrypt_data1) + ' или ' +
+          str(decrypt_data2) + ', или ' +
+          str(decrypt_data3) + ', или ' +
+          str(decrypt_data4) + '\n')
     print()
