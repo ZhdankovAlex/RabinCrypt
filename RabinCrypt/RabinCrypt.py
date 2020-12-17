@@ -3,6 +3,7 @@ import decimal
 import random
 
 from tkinter import *
+import os
 
 # проверяем число на простоту
 def IsPrime(number):
@@ -100,12 +101,12 @@ def Decrypt(data, p, q, n):
     r4 = n - r3
     return r1, r2, r3, r4
 
-# обработчик события нажатия на кнопку
-def Click():
-    input_file = open('input.txt', 'r')
+# зашифруем данные
+def ClickEncrypt():
+    input_file = open('source/input.txt', 'r')
     data = int(input_file.read())
-
-    primes = FindPrimes(0, 1000)    
+    # границы регулируем относительно величины введённого нами числа
+    primes = FindPrimes(0, 100000)    
     primesMod = FindModPrimes(primes)
     # (p,q) - закрытый ключ системы
     p = ChoiceRandomPrime(primesMod)
@@ -117,31 +118,41 @@ def Click():
     # n - открытый ключ системы
     n = p * q 
     # сохраним все вычисленные значения
-    output_file = open('output.txt', 'w')
+    output_file = open('source/output.txt', 'w')
     output_file.write(str(p) + '\n')
     output_file.write(str(q) + '\n')
     output_file.write(str(n) + '\n')
     encrypt_data = Encrypt(data, n)
     output_file.write(str(encrypt_data) + '\n' + '\n')
     output_file.close
-    # расшифруем зашифрованные данные
-    output_file = open('output.txt', 'a+')
-    all_data = output_file.read().splitlines()
-    p = (int)(all_data[0])
-    q = (int)(all_data[1])   
-    n = (int)(all_data[2])
-    data = (int)(all_data[3])
-    r1, r2, r3, r4 = Decrypt(data, p, q, n)
-    output_file.write(str(r1) + '\n' +
-                      str(r2) + '\n' +
-                      str(r3) + '\n' +
-                      str(r4) + '\n')
+
+# расшифруем зашифрованные данные
+def ClickDecrypt():
+    output_file = open('source/output.txt', 'r+')
+    if os.stat('source/output.txt').st_size != 0:
+        # сохраним все прочитанные строки без '\n'
+        all_data = output_file.read().splitlines()
+        p = (int)(all_data[0])
+        q = (int)(all_data[1])   
+        n = (int)(all_data[2])
+        data = (int)(all_data[3])
+        r1, r2, r3, r4 = Decrypt(data, p, q, n)
+        output_file.write(str(r1) + '\n' +
+                          str(r2) + '\n' +
+                          str(r3) + '\n' +
+                          str(r4) + '\n')
+    else:
+        print('Сначала зашифруйте данные!')
     output_file.close
 
 window = Tk()
 window.title("Криптографическая система Рабина")
 
-btn1 = Button(window, text = "ЗАПУСТИТЬ", bg = "yellow", fg = "black", command = Click)
-btn1.grid(column = 0, row = 0)       
+btn1 = Button(window, text = "Зашифровать", 
+              bg = "yellow", fg = "black", command = ClickEncrypt)
+btn1.grid(column = 0, row = 0)   
+btn2 = Button(window, text = "Расшифровать", 
+              bg = "orange", fg = "black", command = ClickDecrypt)
+btn2.grid(column = 1, row = 0)
 
 window.mainloop()
